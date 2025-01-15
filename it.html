@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Database Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f7fa;
+            color: #333;
+        }
+
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        input {
+            padding: 8px;
+            width: 300px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            margin-bottom: 10px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #4CAF50;
+        }
+
+        button {
+            margin: 10px 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #dataForm, #searchResults, #deleteList {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        .input-container {
+            margin-bottom: 15px;
+        }
+
+        .input-container input {
+            width: calc(100% - 16px);
+        }
+
+        .results-container {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9f7e9;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+        }
+
+        .results-container p {
+            margin: 5px 0;
+        }
+
+        .results-container strong {
+            color: #007BFF;
+        }
+
+        .delete-checkbox {
+            margin-right: 10px;
+        }
+
+        .delete-list {
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .delete-confirm-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #dc3545;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .delete-confirm-btn:hover {
+            background-color: #c82333;
+        }
+
+        .delete-list h3 {
+            color: #721c24;
+        }
+
+        .data-list {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-item:last-child {
+            border-bottom: none;
+        }
+
+        .edit-btn, .delete-btn {
+            margin-left: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .edit-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background-color: #218838;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Floating Search Button */
+        #commandInput {
+            width: 350px;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 25px;
+            border: 2px solid #4CAF50;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #commandInput:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+        }
+
+        #searchButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 30px;
+            background-color: #007BFF;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        #searchButton:hover {
+            background-color: #0056b3;
+            transform: scale(1.1);
+        }
+
+        #searchButton:active {
+            transform: scale(1);
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Product Database Finder</h1>
+    <input type="text" id="commandInput" placeholder="Search Product" />
+    <button id="addButton" class="hidden">Create Product</button>
+    <button id="deleteButton" class="hidden">Delete</button>
+
+    <!-- Floating Search Button -->
+    <button id="searchButton">0</button>
+
+    <!-- Data Creation Form -->
+    <div id="dataForm">
+        <div class="input-container">
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Enter Name" required>
+        </div>
+
+        <div class="input-container">
+            <label for="description">Description:</label>
+            <input type="text" id="description" placeholder="Enter Description" required>
+        </div>
+
+        <div class="input-container">
+            <label for="h">Height (H):</label>
+            <input type="number" id="h" placeholder="Enter Height" required>
+        </div>
+
+        <div class="input-container">
+            <label for="w">Width (W):</label>
+            <input type="number" id="w" placeholder="Enter Width" required>
+        </div>
+
+        <div class="input-container">
+            <label for="d">Depth (D):</label>
+            <input type="number" id="d" placeholder="Enter Depth" required>
+        </div>
+
+        <button id="createDataButton">Create Data</button>
+    </div>
+
+    <!-- Search Results -->
+    <div id="searchResults">
+        <h3>Search Results:</h3>
+        <div id="searchOutput" class="results-container"></div>
+    </div>
+
+    <!-- Delete List -->
+    <div id="deleteList" class="delete-list"></div>
+
+    <!-- List of Created Data -->
+    <div id="dataList" class="data-list"></div>
+
+    <script>
+        let dataStore = JSON.parse(localStorage.getItem('dataStore')) || [];
+
+        const commandInput = document.getElementById('commandInput');
+        const addButton = document.getElementById('addButton');
+        const deleteButton = document.getElementById('deleteButton');
+        const dataForm = document.getElementById('dataForm');
+        const createDataButton = document.getElementById('createDataButton');
+        const searchResults = document.getElementById('searchResults');
+        const searchOutput = document.getElementById('searchOutput');
+        const deleteList = document.getElementById('deleteList');
+        const dataList = document.getElementById('dataList');
+        const searchButton = document.getElementById('searchButton');
+
+        // Command input handling
+        commandInput.addEventListener('input', () => {
+            const command = commandInput.value.trim().toLowerCase();
+            if (command === '.add') {
+                addButton.classList.remove('hidden');
+                deleteButton.classList.add('hidden');
+                dataForm.style.display = 'none';
+                searchResults.style.display = 'none';
+                deleteList.innerHTML = '';
+                dataList.innerHTML = ''; // Hide data list when .add is entered
+            } else if (command === '.delete') {
+                deleteButton.classList.remove('hidden');
+                addButton.classList.add('hidden');
+                dataForm.style.display = 'none';
+                searchResults.style.display = 'none';
+                deleteList.innerHTML = '';
+                dataList.innerHTML = ''; // Hide data list when .delete is entered
+            } else {
+                addButton.classList.add('hidden');
+                deleteButton.classList.add('hidden');
+                dataForm.style.display = 'none';
+                searchResults.style.display = 'block';
+                searchOutput.innerHTML = searchForData(command);
+            }
+        });
+
+        // Floating search button click behavior
+        searchButton.addEventListener('click', () => {
+            const command = commandInput.value.trim().toLowerCase();
+            if (command) {
+                searchResults.style.display = 'block';
+                searchOutput.innerHTML = searchForData(command);
+            } else {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // Search for data
+        function searchForData(query) {
+            if (!query) return '';
+            const results = dataStore.filter(item =>
+                item.name.toLowerCase().includes(query.toLowerCase()) ||
+                item.description.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (results.length === 0) {
+                return '<p>No matching data found.</p>';
+            }
+
+            return results.map(item => `
+                <p>
+                    <strong>Name:</strong> ${item.name}<br>
+                    <strong>Description:</strong> ${item.description}<br>
+                    <strong>H:</strong> ${item.H}, <strong>W:</strong> ${item.W}, <strong>D:</strong> ${item.D}
+                </p>
+            `).join('');
+        }
+
+        // Show the form when "+ Data +" button is clicked
+        addButton.addEventListener('click', () => {
+            dataForm.style.display = 'block';
+        });
+
+        // Create and save data
+        createDataButton.addEventListener('click', () => {
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
+            const H = document.getElementById('h').value;
+            const W = document.getElementById('w').value;
+            const D = document.getElementById('d').value;
+
+            if (!name || !description || !H || !W || !D) {
+                alert('Please fill out all fields.');
+                return;
+            }
+
+            const newData = {
+                id: Date.now(),
+                name: name,
+                description: description,
+                H: Number(H),
+                W: Number(W),
+                D: Number(D)
+            };
+
+            dataStore.push(newData);
+            localStorage.setItem('dataStore', JSON.stringify(dataStore));
+
+            alert('Data created successfully!');
+            location.reload();
+        });
+
+        // Display all data
+        function displayDataList() {
+            dataList.innerHTML = '';
+            dataStore.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('data-item');
+                itemDiv.innerHTML = `
+                    <strong>Name:</strong> ${item.name} <br>
+                    <strong>Description:</strong> ${item.description} <br>
+                    <strong>H:</strong> ${item.H}, <strong>W:</strong> ${item.W}, <strong>D:</strong> ${item.D} 
+                    <button class="edit-btn" onclick="editData(${item.id})">Edit</button>
+                    <button class="delete-btn" onclick="deleteData(${item.id})">Delete</button>
+                `;
+                dataList.appendChild(itemDiv);
+            });
+        }
+
+        // Edit Data
+        function editData(id) {
+            const item = dataStore.find(data => data.id === id);
+            document.getElementById('name').value = item.name;
+            document.getElementById('description').value = item.description;
+            document.getElementById('h').value = item.H;
+            document.getElementById('w').value = item.W;
+            document.getElementById('d').value = item.D;
+
+            addButton.classList.add('hidden');
+            dataForm.style.display = 'block';
+            createDataButton.textContent = 'Update Data';
+            createDataButton.onclick = () => updateData(id);
+        }
+
+        // Update Data
+        function updateData(id) {
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
+            const H = document.getElementById('h').value;
+            const W = document.getElementById('w').value;
+            const D = document.getElementById('d').value;
+
+            const itemIndex = dataStore.findIndex(item => item.id === id);
+            if (itemIndex > -1) {
+                dataStore[itemIndex] = { id, name, description, H: Number(H), W: Number(W), D: Number(D) };
+                localStorage.setItem('dataStore', JSON.stringify(dataStore));
+                alert('Data updated successfully!');
+                location.reload();
+            }
+        }
+
+        // Delete Data
+        function deleteData(id) {
+            if (confirm('Are you sure you want to delete this data?')) {
+                dataStore = dataStore.filter(item => item.id !== id);
+                localStorage.setItem('dataStore', JSON.stringify(dataStore));
+                alert('Data deleted successfully!');
+                location.reload();
+            }
+        }
+
+        displayDataList();
+    </script>
+</body>
+</html>
